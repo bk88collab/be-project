@@ -1,0 +1,518 @@
+swagger: '2.0'
+info:
+  description: Movie Wish List Project
+  version: 1.0.0
+  title: Movie Wishlist
+  # put the contact info for your development or API team
+  contact:
+    email: budikurniawan1988@gmail.com
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+# tags are used for organizing operations
+tags:
+- name: User Authentication
+  description: User Auth Information
+- name: Search Movie Wishlist
+  description: Search Movie from Database and IMDB Movie List
+- name: Get Movie Details
+  description: Details of Movie
+- name: Post Wishlist
+  description: Post user wishlist into database
+
+paths:
+  /login:
+    post:
+      tags:
+      - User Authentication
+      summary: User login authentication
+      operationId: userAuthLogin
+      description: User Login
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: User Auth
+        description: Passing username and password to get token
+        schema:
+          $ref: '#/definitions/login'
+      responses:
+        201:
+          description: success login
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "true"
+              message:
+                type: string
+                example: success login
+        400:
+          description: invalid user, username or password invalid
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "false"
+              message:
+                type: string
+                example: register failed
+  /register:
+    post:
+      tags:
+      - User Authentication
+      summary: User register
+      operationId: userAuthRegister
+      description: User Registration
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: User Registration
+        description: Store User Data
+        schema:
+          $ref: '#/definitions/register'
+      responses:
+        201:
+          description: success register
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "true"
+              message: 
+                type: string
+                example: success register
+        400:
+          description: registration failed 
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "false"
+              message: 
+                type: string
+                example: register failed   
+  /search:
+    get:
+      tags:
+      - Search Movie Wishlist
+      operationId: searchMovie
+      description: |
+        By passing in the appropriate options, you can search for
+        available Movie in the local database or IMDB Movie Database
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: searchMovie
+        description: Movie title for search
+        required: true
+        type: string
+      - in: query
+        name: page
+        description: Page number return (1-100)
+        type: integer
+        format: int32
+        minimum: 1
+      - in: query
+        name: year
+        description: Year of release (e.g. 2019)
+        type: string
+      - in: query
+        name: type
+        description: Type of result to return (movie, series, episode)
+        type: string
+      - in: query
+        name: typeData
+        description: The data type to return (json, xml)
+        type: string
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: object
+            properties:
+              Search:
+                type: array
+                items:
+                  $ref: '#/definitions/searchmovie'
+        400:
+          description: movie not found
+          schema:
+              type: object
+              properties:
+                status: 
+                  type: string
+                  example: "false"
+                message:
+                  type: string
+                  example: movie not found
+          
+    post:
+      tags:
+        - Search Movie Wishlist
+      operationId: searchMoviePost
+      description: |
+        Post and store result from in IMDB Movie Database into local database
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: Movie Title
+        description: Store Movie Title
+        schema:
+          $ref: '#/definitions/storesearchmovie'
+      responses:
+        201:
+          description: success store movie
+          schema:
+              type: object
+              properties:
+                status: 
+                  type: string
+                  example: "true"
+                message:
+                  type: string
+                  example: success store movie
+        400:
+          description: failed to store movie
+          schema:
+              type: object
+              properties:
+                status: 
+                  type: string
+                  example: "false"
+                message:
+                  type: string
+                  example: failed to store movie
+  /getmovie:
+      get:
+        tags:
+        - Get Movie Details
+        operationId: getMovie
+        description: |
+          Get Movie details before user assign to their wishlish
+        produces:
+        - application/json
+        parameters:
+        - in: query
+          name: Movie ID
+          description: A valid IMDb ID (e.g. tt4154796)
+          required: true
+          type: string
+        - in: query
+          name: Movie Type
+          description: Type of result to return (movie, series, episode)
+          required: false
+          type: string
+        - in: query
+          name: Callback
+          description: JSONP callback name
+          required: false
+          type: string
+        - in: query
+          name: Data Type
+          description: The data type to return (json, xml)
+          required: false
+          type: string
+        - in: query
+          name: Year
+          description: Year of release (e.g. 2019)
+          required: false
+          type: string
+        - in: query
+          name: Plot
+          description: Return short or full plot (short, full)
+          required: false
+          type: string
+        responses:
+          201:
+            description: success store movie wishlist
+            schema:
+              type: object
+              properties:
+                Title:
+                  type: string
+                  example: "Avengers: Endgame"
+                Year:
+                  type: string
+                  example: "2019"
+                Rated:
+                  type: string
+                  example: "PG-13"
+                Release:
+                  type: string
+                  example: "26 Apr 2019"
+                Runtime:
+                  type: string
+                  example: "181 min"
+                Genre:
+                  type: string
+                  example: "Action, Adventure, Drama"
+                Director:
+                  type: string
+                  example: Anthony Russo, Joe Russo
+                Writer:
+                  type: string
+                  example: Christopher Markus, Stephen McFeely, Stan Lee
+                Actors:
+                  type: string
+                  example: Robert Downey Jr., Chris Evans, Mark Ruffalo
+                Plot:
+                  type: string
+                  example: After the devastating events of Avengers Infinity War (2018), the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe.
+                Language:
+                  type: string
+                  example: English, Japanese, Xhosa, German
+                Country:
+                  type: string
+                  example: United States
+                Awards:
+                  type: string
+                  example: Nominated for 1 Oscar. 69 wins & 114 nominations total
+                Poster:
+                  type: string
+                  example: https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_SX300.jpg
+                Ratings:
+                  type: array
+                  items:
+                    $ref: '#/definitions/ratingsothers'
+                Metascore:
+                  type: string
+                  example: 78
+                imdbRating:
+                  type: string
+                  example: 8.4
+                imdbVotes:
+                  type: string
+                  example: 902,111
+                imdbID:
+                  type: string
+                  example: tt4154796
+                Type:
+                  type: string
+                  example: movie
+                DVD:
+                  type: string
+                  example: 30 Jul 2019
+                BoxOffice:
+                  type: string
+                  example: $858,373,000
+                Production:
+                  type: string
+                  example: Marvel Studios, Walt Disney Pictures
+                Website:
+                  type: string
+                  example: www.example.com
+                Response:
+                  type: string 
+                  example: true
+          400:
+            description: failed to get movie
+            schema:
+              type: object
+              properties:
+                status: 
+                  type: string
+                  example: "false"
+                message:
+                  type: string
+                  example: failed to get movie
+  /postmovie:
+    post:
+      tags:
+        - Post Wishlist
+      operationId: postWishlist
+      description: |
+        Post and store wishlish after user get details movie
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: Movie Wishlist
+        description: Add to movie wishlist after search API
+        schema:
+          $ref: '#/definitions/storewishlist'
+      responses:
+        201:
+          description: success store wishlist
+          schema:
+            type: object
+            properties:
+              status: 
+                type: string
+                example: "true"
+              message:
+                type: string
+                example: success store wishlist
+        400:
+          description: failed to store movie
+          schema:
+            type: object
+            properties:
+              status: 
+                type: string
+                example: "false"
+              message:
+                type: string
+                example: failed store wishlist
+definitions:
+  login:
+    type: object
+    required:
+    - username
+    - password
+    properties:
+      username:
+        type: string
+        example: JohnDoe
+      password:
+        type: string
+        example: password
+  register:
+    type: object
+    required:
+    - firstname
+    - lastname
+    - email
+    - username
+    - password
+    properties:
+      firstname:
+        type: string
+        example: John
+      lastname:
+        type: string
+        example: Doe
+      email:
+        type: string
+        example: budikurniawan1988@gmail.com
+      username:
+        type: string
+        example: JohnDoe
+      password:
+        type: string
+        example: password
+  searchmovie:
+    type: object
+    required: 
+    - searchMovie
+    properties: 
+      Title:
+        type: string
+        example: Avenger End Game
+      Year:
+        type: string
+        example: 2019
+      imdbId:
+        type: string
+        example: tt4154796
+      Type:
+        type: string
+        example: movie
+      Poster:
+        type: string
+        example: https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_SX300.jpg
+  storesearchmovie:
+    type: object
+    required:
+    - Title
+    - imdbId
+    properties:
+      movie_id: 
+        type: string
+        example: tt4154796
+      movie_title:
+        type: string
+        example: Avenger End Game
+      movie_year:
+        type: string
+        example: 2019
+  ratingsothers:
+    type: object
+    properties:
+      Source:
+        type: string
+        example: Internet Movie Database
+      Value:
+        type: string
+        example: 8.4/10
+  storewishlist:
+    type: object
+    required:
+    - id log wishlist
+    - user id
+    - movie id
+    properties:
+      id_log_wishlist:
+        type: integer
+        format: int32
+        example: 23
+      user_id:
+        type: integer
+        format: int32
+        example: 1
+      movie_id:
+        type: string
+        example: tt4154796
+      movie_title:
+        type: string
+        example: "Avenger: End Game"
+      movie_year:
+        type: string
+        example: 2019
+      movie_rated:
+        type: string
+        example: PG-13
+      movie_released:
+        type: string
+        example: 29 Jun 2019
+      movie_runtime:
+        type: string
+        example: 181 min
+      movie_genre:
+        type: string
+        example: Action, Adventure, Drama
+      movie_director:
+        type: string
+        example: Anthony Russo, Joe Russo
+      movie_writer:
+        type: string
+        example: Christopher Markus, Stephen McFeely, Stan Lee
+      movie_actor:
+        type: string
+        example: Robert Downey Jr., Chris Evans, Mark Ruffalo
+      movie_plot:
+        type: string
+        example: After the devastating events of Avengers: Infinity War (2018), the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe.
+      movie_language:
+        type: string
+        example: English, Japanese, Xhosa, German
+      movie_country:
+        type: string
+        example: United States
+      movie_award:
+        type: string
+        example: Nominated for 1 Oscar. 69 wins & 114 nominations total
+      movie_poster:
+        type: string
+        example: https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_SX300.jpg
+      movie_imdb_rating:
+        type: string
+        example: 8.4
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /bk88collab/moviewishlist/1.0.0
+schemes:
+ - https
