@@ -43,8 +43,6 @@ func main() {
 }
 
 func LoginUserController(c echo.Context) error {
-	//email := c.FormValue("email")
-	//password := c.FormValue("password")
 	var userLogin UserLogin
 	c.Bind(&userLogin)
 
