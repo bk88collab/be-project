@@ -34,7 +34,6 @@ type UserOneResponse struct {
 }
 
 func main() {
-	//fmt.Print("Hello World!")
 	e := echo.New()
 	e.GET("/users", GetUserController)
 	e.POST("/users/login", LoginUserController)
