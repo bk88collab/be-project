@@ -38,5 +38,8 @@ func main() {
 	}
 
 	routeInit.RouteRegister(e)
+	e.Start(
+		":8000",
+	)
 
 }
