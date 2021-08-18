@@ -19,24 +19,20 @@ func NewUserRepository(db *gorm.DB) users.Repository {
 
 func (repository *userRepository) Insert(ctx context.Context, domain *users.Domain) (users.Domain, error) {
 	record := fromDomainToRecord(domain)
-
 	result := repository.dbConn.Create(&record)
 	if result.Error != nil {
 		return users.Domain{}, result.Error
 	}
-
 	return record.toDomain(), nil
 }
 
 func (repository *userRepository) UpdateUser(ctx context.Context, userId int, domain *users.Domain) error {
 	record := fromDomainToRecord(domain)
-
 	record.Id_user = userId
 	err := repository.dbConn.Where("id_user = ?", userId).Updates(&record).Error
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
