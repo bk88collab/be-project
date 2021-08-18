@@ -4,8 +4,13 @@ import (
 	"movie/app/routes"
 	_UserUseCase "movie/businesses/users"
 	_UserController "movie/controllers/users"
-	"movie/drivers/mysql"
 	_UserRepository "movie/drivers/repository/users"
+
+	_LinkUrlUseCase "movie/businesses/linktrailers"
+	_LinkUrlController "movie/controllers/linktrailers"
+	_LinkUrlRepository "movie/drivers/repository/linktrailers"
+
+	"movie/drivers/mysql"
 
 	echo "github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -14,6 +19,7 @@ import (
 func dbMigrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&_UserRepository.Users{},
+		&_LinkUrlRepository.LinkUrl{},
 	)
 }
 
@@ -33,8 +39,13 @@ func main() {
 	userUsecase := _UserUseCase.NewUserUseCase(userRepo)
 	userCtrl := _UserController.NewUserController(userUsecase)
 
+	linkUrlRepo := _LinkUrlRepository.NewLinkRepository(db)
+	linkUrlUsecase := _LinkUrlUseCase.NewLinkUseCase(linkUrlRepo)
+	linkUrlCtrl := _LinkUrlController.NewLinkTrailerController(linkUrlUsecase)
+
 	routeInit := routes.ControllerList{
-		UserController: *userCtrl,
+		UserController:    *userCtrl,
+		LinkUrlController: *linkUrlCtrl,
 	}
 
 	routeInit.RouteRegister(e)

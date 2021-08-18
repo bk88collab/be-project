@@ -1,65 +1,43 @@
-package users
+package linktrailers
 
 import (
-	"movie/businesses/users"
-	"movie/controllers/users/request"
+	linktrailers "movie/businesses/linktrailers"
+	controller "movie/controllers"
+	"movie/controllers/linktrailers/request"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
-
-	controller "movie/controllers"
 )
 
-type UserController struct {
-	userUseCase users.UseCase
+type LinkTrailerController struct {
+	linkTrailerUseCase linktrailers.UseCase
 }
 
-func NewUserController(uc users.UseCase) *UserController {
-	return &UserController{
-		userUseCase: uc,
+func NewLinkTrailerController(luc linktrailers.UseCase) *LinkTrailerController {
+	return &LinkTrailerController{
+		linkTrailerUseCase: luc,
 	}
 }
 
-func (ctrl *UserController) Register(c echo.Context) error {
+func (ctrl *LinkTrailerController) CreateLink(c echo.Context) error {
 	ctx := c.Request().Context()
-	request := request.Users{}
+	request := request.LinkTrailer{}
 	if err := c.Bind(&request); err != nil {
 		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	_, err := ctrl.userUseCase.Register(ctx, request.ToDomain())
+	_, err := ctrl.linkTrailerUseCase.Create(ctx, request.ToDomain())
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	return controller.NewSuccessResponse(c, request.ToDomain())
 }
 
-func (ctrl *UserController) Update(c echo.Context) error {
+func (ctrl *LinkTrailerController) UpdateLink(c echo.Context) error {
 	ctx := c.Request().Context()
-	req := request.Users{}
-	paramId := c.Param("userId")
-	err := c.Bind(&req)
-	if err != nil {
-		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
-	}
-
-	id, err := strconv.Atoi(paramId)
-	if err != nil {
-		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
-	}
-
-	err = ctrl.userUseCase.Update(ctx, id, req.ToDomain())
-	if err != nil {
-		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
-	}
-	return controller.NewSuccessResponse(c, req.ToDomain())
-}
-
-func (ctrl *UserController) Delete(c echo.Context) error {
-	ctx := c.Request().Context()
-	req := request.Users{}
-	paramId := c.Param("userId")
+	req := request.LinkTrailer{}
+	paramId := c.Param("id_trailer")
 	err := c.Bind(&req)
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
@@ -68,26 +46,42 @@ func (ctrl *UserController) Delete(c echo.Context) error {
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	err = ctrl.userUseCase.Delete(ctx, id, req.ToDomain())
+	err = ctrl.linkTrailerUseCase.Update(ctx, id, req.ToDomain())
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	return controller.NewSuccessResponse(c, req.ToDomain())
 }
 
-func (ctrl *UserController) Profile(c echo.Context) error {
+func (ctrl *LinkTrailerController) DeleteLink(c echo.Context) error {
 	ctx := c.Request().Context()
-	req := request.Users{}
-	paramId := c.Param("userName")
+	req := request.LinkTrailer{}
+	paramId := c.Param("id_trailer")
 	err := c.Bind(&req)
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
-
-	userName := paramId
-	response, errRes := ctrl.userUseCase.GetProfile(ctx, userName)
-	if errRes != nil {
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	return controller.NewSuccessResponse(c, response)
+	err = ctrl.linkTrailerUseCase.Delete(ctx, id, req.ToDomain())
+	if err != nil {
+		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	return controller.NewSuccessResponse(c, req.ToDomain())
+}
+
+func (ctrl *LinkTrailerController) GetLink(c echo.Context) error {
+	ctx := c.Request().Context()
+	request := request.LinkTrailer{}
+	if err := c.Bind(&request); err != nil {
+		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	_, err := ctrl.linkTrailerUseCase.GetUrl(ctx, request.ToDomain())
+	if err != nil {
+		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	return controller.NewSuccessResponse(c, request.ToDomain())
 }
