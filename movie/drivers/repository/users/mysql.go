@@ -56,12 +56,10 @@ func (repository *userRepository) GetUserByID(ctx context.Context, userId int) (
 
 func (repository *userRepository) DeleteUser(ctx context.Context, userId int, domain *users.Domain) error {
 	record := fromDomainToRecord(domain)
-
 	record.Id_user = userId
 	err := repository.dbConn.Where("id_user = ?", userId).Delete(&record).Error
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
